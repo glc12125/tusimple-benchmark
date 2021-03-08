@@ -7,6 +7,7 @@ class VeloEval(object):
     def load_json_file(file_list):
         data_list = []
         for file_name in file_list:
+            #print("{}".format(file_name))
             with open(file_name) as f:
                 raw_data = json.load(f)
             data_list.append(raw_data)
@@ -30,7 +31,7 @@ class VeloEval(object):
     def load_annotation(file_list):
         raw_data_list = VeloEval.load_json_file(file_list)
         anno_list = VeloEval.transform_annotation(raw_data_list)
-        print "Finished loading {0:d} annotations.".format(len(anno_list))
+        print("Finished loading {0:d} annotations.".format(len(anno_list)))
         return anno_list
 
     @staticmethod
@@ -54,8 +55,15 @@ class VeloEval(object):
     @staticmethod
     def find_nearest_gt(pred, x_gt):
         bboxes = np.vstack([x["bbox"] for x in x_gt])
+        print("bboxes: {}".format(bboxes))
+        print("pred: {}".format(pred))
+        print("pred[bbox]: {}".format(pred["bbox"]))
+        print("np.subtract(bboxes, pred[bbox]): {}".format(np.subtract(bboxes, pred["bbox"])))
+        print("np.abs(np.subtract(bboxes, pred[bbox]): {}".format(np.abs(np.subtract(bboxes, pred["bbox"]))))
+        print("np.sum(np.abs(np.subtract(bboxes, pred[bbox])), axis=1): {}".format(np.sum(np.abs(np.subtract(bboxes, pred["bbox"])), axis=1)))
         difference = np.sum(np.abs(np.subtract(bboxes, pred["bbox"])), axis=1)
-        if np.min(difference) > 10:
+        if np.min(difference) > 200:
+            print("difference: {}".format(difference))
             raise Exception('We do not get all the predictions for a certain frame')
         return x_gt[np.argmin(difference)]
 
@@ -76,14 +84,14 @@ class VeloEval(object):
         pe1 = np.mean(np.array(pos_error[1]))
         pe2 = np.mean(np.array(pos_error[2]))
 
-        print "Velocity Estimation error (Near): {0:.5f}".format(ve0)
-        print "Velocity Estimation error (Medium): {0:.5f}".format(ve1)
-        print "Velocity Estimation error (Far): {0:.5f}".format(ve2)
-        print "Velocity Estimation error total: {0: 5f}".format((ve0 + ve1 + ve2) / 3)
-        print "Position Estimation error (Near): {0:.5f}".format(pe0)
-        print "Position Estimation error (Medium): {0:.5f}".format(pe1)
-        print "Position Estimation error (Far): {0:.5f}".format(pe2)
-        print "Position Estimation error total: {0:.5f}".format((pe0 + pe1 + pe2) / 3)
+        print("Velocity Estimation error (Near): {0:.5f}".format(ve0))
+        print("Velocity Estimation error (Medium): {0:.5f}".format(ve1))
+        print("Velocity Estimation error (Far): {0:.5f}".format(ve2))
+        print("Velocity Estimation error total: {0: 5f}".format((ve0 + ve1 + ve2) / 3))
+        print("Position Estimation error (Near): {0:.5f}".format(pe0))
+        print("Position Estimation error (Medium): {0:.5f}".format(pe1))
+        print("Position Estimation error (Far): {0:.5f}".format(pe2))
+        print("Position Estimation error total: {0:.5f}".format((pe0 + pe1 + pe2) / 3))
         return (ve0 + ve1 + ve2) / 3, (pe0 + pe1 + pe2) / 3
 
     @staticmethod
@@ -133,7 +141,7 @@ if __name__ == '__main__':
     try:
         if len(sys.argv) != 3:
             raise Exception('Invalid input arguments')
-        print VeloEval.bench_one_submit(sys.argv[1], sys.argv[2])
+        print(VeloEval.bench_one_submit(sys.argv[1], sys.argv[2]))
     except Exception as e:
-        print e.message
+        print(e.message)
         sys.exit(e.message)
